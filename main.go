@@ -38,6 +38,11 @@ func commandFlags() []cli.Flag {
 			Usage: "GitHub repository name",
 		},
 		cli.StringFlag{
+			Name:   "issue_title, t",
+			Value:  "Dependency Updates",
+			Usage:  "Github issue title",
+		},
+		cli.StringFlag{
 			Name:  "report_file, f",
 			Value: "",
 			Usage: "The generated JSON file in Gradle Versions Plugin.",
@@ -125,7 +130,7 @@ func main() {
 			return cli.NewExitError(err.Error(), 1)
 		}
 
-		err = reportToGithub(GithubReport{"Updates", report}, c.String("github_access_token"), c.String("user"), c.String("repository"))
+		err = reportToGithub(GithubReport{c.String("issue_title"), report}, c.String("github_access_token"), c.String("user"), c.String("repository"))
 		if err != nil {
 			return cli.NewExitError(err.Error(), 1)
 		}
