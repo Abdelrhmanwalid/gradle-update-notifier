@@ -4,12 +4,16 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
+
+type GithubReport struct {
+	Title  string
+	Report Report
+}
 
 func generateIssueBody(report Report, releaseNotes []ReleaseNote) string {
 	var body string
@@ -28,9 +32,9 @@ func generateIssueBody(report Report, releaseNotes []ReleaseNote) string {
 	return body
 }
 
-func reportToGithub(report Report, githubAccessToken, userName, repositoryName string) error {
+func reportToGithub(githubReport GithubReport, githubAccessToken, userName, repositoryName string) error {
 	var pkgs string
-	for _, dependency := range report.Outdated.Dependencies {
+	for _, dependency := range githubReport.Report.Outdated.Dependencies {
 		pkgs += dependency.Pkg() + ","
 	}
 	pkgs = strings.TrimRight(pkgs, ",")
@@ -40,15 +44,14 @@ func reportToGithub(report Report, githubAccessToken, userName, repositoryName s
 		return err
 	}
 
-	body := generateIssueBody(report, releaseNotes)
+	body := generateIssueBody(githubReport.Report, releaseNotes)
 
 	if len(body) == 0 {
 		// No libraries need to update
 		return nil
 	}
 
-	currentTime := time.Now()
-	title := "dependency-updates-" + currentTime.Format("20060102150405")
+	title := githubReport.Title
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: githubAccessToken},
 	)

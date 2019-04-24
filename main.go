@@ -125,7 +125,7 @@ func main() {
 			return cli.NewExitError(err.Error(), 1)
 		}
 
-		err = reportToGithub(report, c.String("github_access_token"), c.String("user"), c.String("repository"))
+		err = reportToGithub(GithubReport{"Updates", report}, c.String("github_access_token"), c.String("user"), c.String("repository"))
 		if err != nil {
 			return cli.NewExitError(err.Error(), 1)
 		}
