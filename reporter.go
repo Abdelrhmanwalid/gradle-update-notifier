@@ -15,7 +15,7 @@ type GithubReport struct {
 	Report Report
 }
 
-func generateIssueBody(report Report, releaseNotes []ReleaseNote) string {
+func generateIssueBody(report Report) string {
 	var body string
 	var dependency Dependency
 
@@ -23,8 +23,8 @@ func generateIssueBody(report Report, releaseNotes []ReleaseNote) string {
 		dependency = report.Outdated.Dependencies[i]
 		body += fmt.Sprintf("* [ ] `%v:%v`", dependency.Pkg(), dependency.Available.Release)
 
-		if len(releaseNotes[i].URL) > 1 {
-			body += fmt.Sprintf("([Release Note](%v))\n", releaseNotes[i].URL)
+		if len(dependency.ProjectUrl) > 0 {
+			body += fmt.Sprintf("([Url](%v))\n", dependency.ProjectUrl)
 		} else {
 			body += "\n"
 		}
@@ -39,13 +39,8 @@ func reportToGithub(githubReport GithubReport, githubAccessToken, userName, repo
 	}
 	pkgs = strings.TrimRight(pkgs, ",")
 
-	releaseNotes, err := getReleaseNotes(pkgs)
-	if err != nil {
-		return err
-	}
-
-	body := generateIssueBody(githubReport.Report, releaseNotes)
-
+	body := generateIssueBody(githubReport.Report)
+	fmt.Printf("%+v\n", body)
 	if len(body) == 0 {
 		// No libraries need to update
 		return nil
@@ -61,7 +56,7 @@ func reportToGithub(githubReport GithubReport, githubAccessToken, userName, repo
 	issueRequest := &github.IssueRequest{Title: &title, Body: &body}
 
 	ctx := context.Background()
-	_, _, err = client.Issues.Create(ctx, userName, repositoryName, issueRequest)
+	_, _, err := client.Issues.Create(ctx, userName, repositoryName, issueRequest)
 	if err != nil {
 		return errors.Wrap(err, "issue create failed")
 	}

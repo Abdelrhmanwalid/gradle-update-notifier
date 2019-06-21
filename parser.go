@@ -16,10 +16,11 @@ type Available struct {
 
 // Dependency is type for android library
 type Dependency struct {
-	Group     string
-	Version   string
-	Available Available
-	Name      string
+	Group      string
+	Version    string
+	Available  Available
+	Name       string
+	ProjectUrl string/*  */
 }
 
 // Item is type for android library
