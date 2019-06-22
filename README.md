@@ -7,7 +7,7 @@
 ## Installation
 
 ```sh
-$ go get github.com/y-yagi/gradle-update-notifier
+$ go get github.com/abdelrhmanwalid/gradle-update-notifier
 ```
 
 ## Usage
